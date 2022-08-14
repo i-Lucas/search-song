@@ -1,0 +1,4 @@
+{
+    "LOCAL_API": "http://localhost:5000",
+    "HEROKU_API": "https://search-song-api.herokuapp.com/"
+}
