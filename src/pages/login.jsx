@@ -4,8 +4,8 @@ import config from "../config.json"
 import styled from 'styled-components';
 import Storage from "../services/storage";
 import { useNavigate } from "react-router-dom";
-import { ThreeDots } from "react-loader-spinner"
-import Loader from "../components/loader";
+import { ThreeDots } from "react-loader-spinner";
+import Welcome from './welcome';
 
 export default function Login() {
 
@@ -17,16 +17,10 @@ export default function Login() {
     const [start, setStart] = React.useState(false);
 
     React.useEffect(() => {
-
-        axios.post(config.HEROKU_API + "/start-app").then(res => {
-            setStart(true);
-        }).catch(err => {
-            console.log(err)
-        });
-
+        axios.post(config.HEROKU_API + "/start-app").then(res => setStart(true)).catch(err => console.log(err));
     }, [state]);
 
-    const LinkContent = state.signup ? "Already have an account? Sign-In!" : "Don't have an account? Sign-Up!";
+    const LinkContent = state.signup ? "Already have an account ? Sign-In!" : "Don't have an account ? Sign-Up!";
     const ButtonContent = state.loading ? <ThreeDots width={50} /> : state.signup ? "Sign Up" : "Sign In";
     const TitleContent = state.signup ? "Sign Up" : "Sign In";
 
@@ -70,7 +64,10 @@ export default function Login() {
         }
     };
 
-    return !start ? <Loader width={250} color={"white"} /> :
+    return !start ?
+
+        <Welcome start={start} /> :
+    
         (
             <PageContainer>
                 <FormContainer>

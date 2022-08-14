@@ -3,9 +3,10 @@ import axios from "axios";
 import config from "../config.json"
 import styled from "styled-components"
 import Header from "../components/header";
-import { ThreeDots } from "react-loader-spinner"
+import search from "../assets/search.svg";
 import Session from "../services/session";
 import RenderSongs from "../components/songs";
+import { ThreeDots } from "react-loader-spinner"
 
 export default function Home() {
 
@@ -14,11 +15,16 @@ export default function Home() {
     const [loading, setLoading] = React.useState(false);
 
     function onSearch(value) {
+
         setLoading(true);
-        axios.post(`${config.HEROKU_API}/search`, { music: value, userId })
+
+        // remove special characters from the search
+        const cleanValue = value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        axios.post(`${config.HEROKU_API}/search`, { music: cleanValue, userId })
             .then(res => {
-                setLoading(false);
                 setResults(res.data);
+                setLoading(false);
             }).catch(err => console.log(err))
     };
 
@@ -42,7 +48,12 @@ export default function Home() {
                                 onKeyDown={(e) => { if (e.key === "Enter") { onSearch(e.target.value); e.target.value = "" } }} />
                         </SearchBar>
 
-                        <RenderSongs songs={results} uid={userId}/>
+                        {results.length > 0 ? <RenderSongs songs={results} /> :
+                            <NoSongs>
+                                <img src={search} alt="search" />
+                                <h1>search for a song</h1>
+                            </NoSongs>
+                        }
                     </React.Fragment>
                 }
             </Body>
@@ -95,4 +106,35 @@ const LoaderContainer = styled.div`
     justify-content: center;
     align-items: center;
     background-color: var(--my-color);
+`;
+
+const NoSongs = styled.div`
+
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;        
+
+    img {
+        width: 20%;
+    }
+
+    h1 {
+
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: var(--my-font);
+        color: white;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        height: 50vh;
+
+        img {
+            width: 50%;
+        }
+    }
 `;

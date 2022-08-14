@@ -1,10 +1,9 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
-export default function RenderSongs({ songs, uid }) {
+export default function RenderSongs({ songs }) {
 
     const navigate = useNavigate();
-
     const increment = window.location.pathname === "/rank/songs" || window.location.pathname === "/saved/songs";
 
     function goTo(id) {

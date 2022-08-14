@@ -4,8 +4,9 @@ import config from "../config.json"
 import styled from "styled-components";
 import Header from "../components/header";
 import Loader from "../components/loader";
-import { useParams, useLocation } from "react-router-dom"
 import Session from "../services/session";
+import { ThreeDots } from "react-loader-spinner";
+import { useParams, useLocation } from "react-router-dom"
 
 export default function Lyrics() {
 
@@ -14,6 +15,7 @@ export default function Lyrics() {
     const [lyric, setLyric] = React.useState({});
     const [loading, setLoading] = React.useState(true);
     const [update, setUpdate] = React.useState(false);
+    const [saving, setSaving] = React.useState(false);
 
     const location = useLocation();
     const increment = location.state.increment_views;
@@ -22,7 +24,8 @@ export default function Lyrics() {
     React.useEffect(() => {
 
         if (userId === null) return;
-        axios.get(`${config.HEROKU_API}/lyrics/${musicId}?increment=${increment}&user=${userId}`).then(res => {
+        axios.get(`${config.HEROKU_API}/lyrics/${musicId}?increment=${increment}&user=${userId}`)
+        .then(res => {
             setLyric(res.data);
             setLoading(false);
         }).catch(err => console.log(err));
@@ -30,9 +33,14 @@ export default function Lyrics() {
     }, [userId, musicId, increment, update]);
 
     function saveThis(id) {
-        setUpdate(!update);
-        axios.post(`${config.HEROKU_API}/save/${id}`, { userId }).then(res => {
-            setUpdate(!update);
+
+        setSaving(true);
+        axios.post(`${config.HEROKU_API}/save/${id}`, { userId })
+        .then(res => {
+            setTimeout(() => {
+                setUpdate(!update);
+                setSaving(false);
+            }, 1200);
         }).catch(err => console.log(err.response.data));
     };
 
@@ -69,8 +77,11 @@ export default function Lyrics() {
             }
 
             <SaveOrDelete>
-                {!loading && <ion-icon name={icon_save} onClick={() => saveThis(lyric.id)} />}
-                {!loading && <Title size={"12px"} >{lyric.saved ? "saved !" : "save"}</Title>}
+                {!loading ?
+                    saving ? <ThreeDots width={50} color={"white"} /> :
+                    <ion-icon name={icon_save} onClick={() => saveThis(lyric.id)} /> : null
+                }
+                {!loading && <Title size={"8px"} >{saving ? "" : lyric.saved ? "saved" : "save"}</Title>}
             </SaveOrDelete>
         </LyricsComponent>
     )
@@ -87,7 +98,7 @@ const SaveOrDelete = styled.div`
 
     width: 10%;
     height: 10%;
-    top: 10%;
+    bottom: 2%;
     display: flex;
     position: absolute;
     align-items: center;
@@ -110,14 +121,14 @@ const SaveOrDelete = styled.div`
     }
 
     @media (max-width: 768px) {
-        
+
         ion-icon {
             font-size: 1.2rem;
         }
         h1 {
             font-size: 12px;
             margin-right: 2px;
-        }
+        }4
     }
 `;
 

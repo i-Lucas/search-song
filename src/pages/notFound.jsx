@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import notfound from "../assets/notfound.svg";
+import notfound from "../assets/nfound.svg";
 
 export default function NotFound() {
 
