@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 export default function RenderSongs({ songs }) {
 
     const navigate = useNavigate();
-    const increment = window.location.pathname === "/rank/songs" || window.location.pathname === "/saved/songs";
+    
+    const increment = window.location.pathname === "/rank/songs"
+        || window.location.pathname === "/saved/songs"
+        || window.location.pathname === "/search/advanced";
 
     function goTo(id) {
         return navigate(`/lyrics/${id}`, { state: { increment_views: increment ? false : true } });
