@@ -15,10 +15,8 @@ export default function RankArtists() {
 
         setLoading(true);
         axios.get(config.HEROKU_API + "/rank/bands").then(res => {
-
             setRank(res.data);
             setLoading(false);
-            console.log(res.data);
         }).catch(err => {
             console.log(err);
             setLoading(false);
@@ -31,21 +29,17 @@ export default function RankArtists() {
             <Header />
             <RankArtistsContent>
                 {loading ? <Loader /> :
-
                     rank.map(band => (
                         <ArtistBox key={band.id}>
                             <Name>{band.name}</Name>
                             <Views>Researches: {band.visits}</Views>
                         </ArtistBox>
                     ))}
-
-
                 {rank.length === 0 &&
                     <NoSongs>
                         <img src={nobands} alt="search" />
                         <h1>do an advanced search</h1>
-                    </NoSongs>
-                }
+                    </NoSongs>}
             </RankArtistsContent>
         </RankArtistsContainer>
     )

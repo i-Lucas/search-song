@@ -3,8 +3,10 @@ import axios from "axios";
 import config from "../config.json";
 import styled from "styled-components";
 import Header from "../components/header";
-import { ThreeDots } from "react-loader-spinner";
+import alien from "../assets/alien.svg";
+import empty_ from "../assets/empty_.svg";
 import RenderSongs from "../components/songs";
+import { ThreeDots } from "react-loader-spinner";
 
 export default function AdvancedSearch() {
 
@@ -12,6 +14,7 @@ export default function AdvancedSearch() {
     const [hasResults, setHasResults] = React.useState(false);
     const [data, setData] = React.useState({ artist: "", music: "" });
     const [song, setSong] = React.useState([{ id: "", title: "", band: "", }]);
+    const [status, setStatus] = React.useState({ anyResults: false, notFound: false });
     const buttonContent = loading ? <ThreeDots width={60} color={"var(--my-color)"} /> : "Search";
 
     function onSearch() {
@@ -23,8 +26,15 @@ export default function AdvancedSearch() {
 
                 setLoading(false);
 
-                if (res.data.type === "song_notfound") return alert("Song not found");
-                if (res.data.type === "notfound") return alert("Any result found");
+                if (res.data.type === "song_notfound") {
+                    setHasResults(false);
+                    setStatus({ anyResults: false, notFound: true });
+                };
+
+                if (res.data.type === "notfound") {
+                    setHasResults(false);
+                    setStatus({ anyResults: true, notFound: false });
+                };
 
                 if (res.data.type === "exact") {
 
@@ -62,7 +72,13 @@ export default function AdvancedSearch() {
                     </Form>
                 </SearchBar>
                 <SearchResults>
-                    {hasResults && <RenderSongs songs={song} />}
+                    {hasResults ?
+                        <RenderSongs songs={song} /> :
+                        status.notFound ?
+                            <NoSongs><img src={empty_} alt="empty" /><h1>Song not found !</h1></NoSongs> :
+                            status.anyResults ?
+                                <NoSongs><img src={alien} alt="empty" /><h1>Any result found :/</h1></NoSongs> :
+                                null}
                 </SearchResults>
             </AdvanceContainer>
         </AdvancedSearchContainer>
@@ -155,5 +171,32 @@ const SearchResults = styled.div`
 
     @media (max-width: 768px) {
         height: 70%;
+    }
+`;
+
+const NoSongs = styled.div`
+
+    width: 100%;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;        
+
+    img {
+        width: 20%;
+    }
+
+    h1 {
+
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: var(--my-font);
+        color: white;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        height: 50vh;
     }
 `;
