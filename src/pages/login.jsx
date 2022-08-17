@@ -16,9 +16,20 @@ export default function Login() {
     const [state, setState] = React.useState({ signup: false, loading: false });
     const [start, setStart] = React.useState(false);
 
+    const [visits, setVisits] = React.useState(0);
+
+    const hasVisited = Storage.GetStore("8af");
+    console.log(hasVisited);
+
     React.useEffect(() => {
-        axios.post(config.HEROKU_API + "/start-app").then(res => setStart(true)).catch(err => console.log(err));
-    }, [state]);
+
+        axios.post(config.HEROKU_API + `/start-app?increment=${!hasVisited}`).then(res => {
+            setStart(true);
+            setVisits(res.data.visits);
+            Storage.SetStore("8af", true)
+        }).catch(err => console.log(err));
+
+    }, [state, hasVisited]);
 
     const LinkContent = state.signup ? "Already have an account ? Sign-In!" : "Don't have an account ? Sign-Up!";
     const ButtonContent = state.loading ? <ThreeDots width={50} /> : state.signup ? "Sign Up" : "Sign In";
@@ -67,7 +78,7 @@ export default function Login() {
     return !start ?
 
         <Welcome start={start} /> :
-    
+
         (
             <PageContainer>
                 <FormContainer>
@@ -90,6 +101,10 @@ export default function Login() {
 
                         <ButtonSubmit type="submit">{ButtonContent}</ButtonSubmit>
                         <Link onClick={() => setState({ ...state, signup: !state.signup })}>{LinkContent}</Link>
+
+                        <NumberOfVisits>
+                            <Visits>Number of visits: {visits}</Visits>
+                        </NumberOfVisits>
                     </Form>
                 </FormContainer>
                 <PanelContainer >
@@ -198,4 +213,23 @@ const PanelContainer = styled.div`
     @media (max-width: 768px) {
         display: none;
     }
+`;
+
+const NumberOfVisits = styled.div`
+
+    position: fixed;
+    bottom: 5%;
+
+    @media (min-width: 768px) {
+        top: 5%;
+        right: 5%;
+    }
+`;
+
+const Visits = styled.h1`
+
+    font-size: 0.8rem;
+    font-family: var(--my-font);
+    font-weight: bold;
+    color: #FFFFFF;
 `;
